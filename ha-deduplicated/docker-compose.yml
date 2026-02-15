@@ -15,16 +15,20 @@ services:
     - --config.file=/etc/prometheus/prometheus.yml
     volumes:
     - ./prometheus/prometheus-2.yml:/etc/prometheus/prometheus.yml:ro
-  prometheus-central:
-    image: prom/prometheus:${PROMETHEUS_TAG}
-    entrypoint: /bin/prometheus
+  victoria-metrics:
+    image: victoriametrics/victoria-metrics:latest
+    container_name: victoria-metrics
     ports:
-    - 9090:9090
-    command:
-    - --config.file=/etc/prometheus/prometheus.yml
-    - --web.enable-remote-write-receiver
+      - "8428:8428" # Remote write and Query API
     volumes:
-    - ./prometheus/prometheus-central.yml:/etc/prometheus/prometheus.yml:ro
+      - ./prometheus/vm-relabel.yml:/etc/victoria-metrics/relabel.yml
+    command:
+      - "-storageDataPath=/storage"
+      - "-retentionPeriod=1"
+      # Enable Deduplication: looks for identical metrics in 30s window
+      - "-dedup.minScrapeInterval=30s"
+      # Path to the file that will strip the 'replica' label
+      - "-relabelConfig=/etc/victoria-metrics/relabel.yml"
   node-exporter:
     image: prom/node-exporter:${NODE_EXPORTER_TAG}
     ports:

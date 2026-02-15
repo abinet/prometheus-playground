@@ -10,4 +10,4 @@ scrape_configs:
       - targets: ['node-exporter:9100']
 
 remote_write:
-  - url: "http://prometheus-central:9090/api/v1/write"
+  - url: "http://victoria-metrics:8428/api/v1/write"
