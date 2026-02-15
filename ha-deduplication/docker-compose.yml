@@ -1,0 +1,31 @@
+services:
+  prometheus1:
+    image: prom/prometheus:${PROMETHEUS_TAG}
+    ports:
+    - 9091:9090
+    command:
+    - --config.file=/etc/prometheus/prometheus.yml
+    volumes:
+    - ./prometheus/prometheus-1.yml:/etc/prometheus/prometheus.yml:ro
+  prometheus2:
+    image: prom/prometheus:${PROMETHEUS_TAG}
+    ports:
+    - 9092:9090
+    command:
+    - --config.file=/etc/prometheus/prometheus.yml
+    volumes:
+    - ./prometheus/prometheus-2.yml:/etc/prometheus/prometheus.yml:ro
+  prometheus-central:
+    image: prom/prometheus:${PROMETHEUS_TAG}
+    entrypoint: /bin/prometheus
+    ports:
+    - 9090:9090
+    command:
+    - --config.file=/etc/prometheus/prometheus.yml
+    - --web.enable-remote-write-receiver
+    volumes:
+    - ./prometheus/prometheus-central.yml:/etc/prometheus/prometheus.yml:ro
+  node-exporter:
+    image: prom/node-exporter:${NODE_EXPORTER_TAG}
+    ports:
+    - 9100:9100
